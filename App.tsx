@@ -2,6 +2,8 @@ import 'react-native-gesture-handler';
 import React, { useState, useEffect } from 'react'
 import { Dimensions, ImageBackground, Image, View, StyleSheet } from 'react-native';
 
+import globalStyles from './styles/global';
+
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 const Stack = createStackNavigator();
@@ -15,6 +17,7 @@ const image = require('./styles/img/imgFondo.jpg');
 
 const {width, height} = Dimensions.get('window');
 
+
 const App = () => {
 
 
@@ -26,6 +29,12 @@ const App = () => {
     <>
         
       <NavigationContainer>
+
+      <ImageBackground
+            source={image}
+            resizeMode="cover"
+            style={[globalStyles.image, { width: width, height: height }]}>
+
         <Stack.Navigator>
           <Stack.Screen
             name="Login"
@@ -52,6 +61,7 @@ const App = () => {
           />
          
         </Stack.Navigator>
+        </ImageBackground>
       </NavigationContainer>
      
     </>

@@ -21,7 +21,7 @@ const MenuPrincipal = ({ navigation, forwardedRef  }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent',
     padding: 20,
   },
   menuItem: {

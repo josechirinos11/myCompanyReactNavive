@@ -1,9 +1,14 @@
-import React, { useState, useEffect , useRef, forwardRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ToastAndroid, Modal, Pressable, StyleSheet, Animated  } from 'react-native';
+import React, { useState, useEffect, useRef, forwardRef } from 'react';
+import { Alert, ImageBackground, Dimensions, View, Text, TextInput, TouchableOpacity, ToastAndroid, Modal, Pressable, StyleSheet, Animated } from 'react-native';
 import globalStyles from '../styles/global';
+import usuarioStyles from '../styles/contenidoUsuarioStyles'
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import MenuPrincipal from './usuario/MenuPrincipal'
+import MenuIzquierdo from './usuario/MenuIzquierdo'
 
+const image = require('../styles/img/imgFondo.jpg');
+
+const { width, height } = Dimensions.get('window');
 
 /**
 // Apollo 
@@ -27,25 +32,41 @@ const ContenidoUsuario = () => {
     // Definir la referencia para el PanGestureHandler
     const panGestureHandlerRef = useRef(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisibleDerecho, setModalVisiblDerecho] = useState(false);
     const slideAnimation = new Animated.Value(-500); // Valor inicial fuera de la pantalla
-
+    const slideAnimationDerecha = new Animated.Value(+500); // Valor inicial fuera de la pantalla
 
 
     useEffect(() => {
         if (modalVisible) {
-          Animated.timing(slideAnimation, {
-            toValue: 0, // Valor final para que el modal se muestre completamente
-            duration: 300, // Duración de la animación
-            useNativeDriver: true, // Utilizar el driver nativo para mejorar el rendimiento
-          }).start();
+            Animated.timing(slideAnimation, {
+                toValue: 0, // Valor final para que el modal se muestre completamente
+                duration: 300, // Duración de la animación
+                useNativeDriver: true, // Utilizar el driver nativo para mejorar el rendimiento
+            }).start();
         } else {
-          Animated.timing(slideAnimation, {
-            toValue: -500, // Valor inicial fuera de la pantalla
-            duration: 300,
-            useNativeDriver: true,
-          }).start();
+            Animated.timing(slideAnimation, {
+                toValue: -500, // Valor inicial fuera de la pantalla
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
         }
-      }, [modalVisible]);
+    }, [modalVisible]);
+    useEffect(() => {
+        if (modalVisibleDerecho) {
+            Animated.timing(slideAnimationDerecha, {
+                toValue: 0, // Valor final para que el modal se muestre completamente
+                duration: 300, // Duración de la animación
+                useNativeDriver: true, // Utilizar el driver nativo para mejorar el rendimiento
+            }).start();
+        } else {
+            Animated.timing(slideAnimationDerecha, {
+                toValue: +500, // Valor inicial fuera de la pantalla
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+        }
+    }, [modalVisibleDerecho]);
 
     // Mutation de apollo
     //  const [crearUsuario] = useMutation(NUEVA_CUENTA);
@@ -101,11 +122,13 @@ const ContenidoUsuario = () => {
             console.log('Deslizamiento de izquierda a derecha');
             setMenuVisible(true);
             setModalVisible(true)
+            setModalVisiblDerecho(false)
         } else if (nativeEvent.translationX < -threshold) {
             // Deslizamiento de derecha a izquierda
             console.log('Deslizamiento de derecha a izquierda');
             setMenuVisible(false);
             setModalVisible(false)
+            setModalVisiblDerecho(true)
         }
     };
 
@@ -115,71 +138,118 @@ const ContenidoUsuario = () => {
 
 
     return (
-        <View style={[globalStyles.contenedor, { backgroundColor: '#2874A6' }]}>
-            <PanGestureHandler
-                ref={panGestureHandlerRef}
-                onGestureEvent={handleGesture}
-            >
-                 <View style={globalStyles.contenido}>
-                    <Modal
-                        animationType="fade"
-                        transparent={true}
-                        visible={modalVisible}
-                        onRequestClose={() => {
-                            Alert.alert('Modal has been closed.');
-                            setModalVisible(!modalVisible);
-                        }}>
+
+        <ImageBackground
+            source={image}
+            resizeMode="cover"
+            style={[globalStyles.image, { width: width, height: height }]}>
+
+            <View style={[globalStyles.contenedor]}>
+                <PanGestureHandler
+                    ref={panGestureHandlerRef}
+                    onGestureEvent={handleGesture}
+                >
+                    <View style={globalStyles.contenido}>
+                        <Modal
+                            animationType="fade"
+                            transparent={true}
+                            visible={modalVisible}
+                            onRequestClose={() => {
+                                Alert.alert('Modal has been closed.');
+                                setModalVisible(!modalVisible);
+                                console.log('fuera del modal')
+                            }}>
 
 
 
-                        <Animated.View
-                         style={[styles.centeredView, { transform: [{ translateX: slideAnimation }] }]}
-                         
-                         >
-                            <View style={styles.modalView}>
-                                <Text style={styles.modalText}>Hello World!</Text>
-                                <Pressable
-                                    style={[styles.button, styles.buttonClose]}
-                                    onPress={() => setModalVisible(!modalVisible)}>
-                                    <Text style={styles.textStyle}>Hide Modal</Text>
-                                </Pressable>
-                            </View>
-                        </Animated.View>
-                    </Modal>
+                            <Animated.View
+                                style={[styles.centeredView, { transform: [{ translateX: slideAnimation }], alignItems: 'flex-start' }]}
+
+                            >
+                                <View style={[usuarioStyles.neumorphismBoton, usuarioStyles.modalView, { width: width / 2, height: height }]}>
+                                    <Text style={styles.modalText}>Modal izquierdo</Text>
+                                    <MenuIzquierdo />
+                                    <Pressable
+                                        style={[styles.button, styles.buttonClose]}
+                                        onPress={() => {
+                                            setModalVisible(!modalVisible)
+                                            console.log('fuera del modal')
+                                        }}>
+                                        <Text style={styles.textStyle}>Cerrar</Text>
+                                    </Pressable>
+                                </View>
+                            </Animated.View>
+                        </Modal>
+
+                        <Modal
+                            animationType="fade"
+                            transparent={true}
+                            visible={modalVisibleDerecho}
+                            onRequestClose={() => {
+                                Alert.alert('Modal has been closed.');
+                                setModalVisiblDerecho(!modalVisibleDerecho);
+                                console.log('fuera del modal')
+                            }}>
 
 
 
-                   
-                        <Text style={globalStyles.titulo}>UpTask</Text>
-                        <TextInput
-                            style={globalStyles.input}
-                            placeholder="Nombre"
-                            onChangeText={texto => guardarNombre(texto)}
-                        />
-                        <TextInput
-                            style={globalStyles.input}
-                            placeholder="Email"
-                            onChangeText={texto => guardarEmail(texto)}
-                        />
-                        <TextInput
-                            style={globalStyles.input}
-                            secureTextEntry={true}
-                            placeholder="Password"
-                            onChangeText={texto => guardarPassword(texto)}
-                        />
-                        <TouchableOpacity
-                            style={globalStyles.boton}
-                            onPress={() => handleSubmit()}
-                        >
-                            <Text style={globalStyles.botonTexto}>Crear Cuenta</Text>
-                        </TouchableOpacity>
+                            <Animated.View
+                                style={[styles.centeredView, { transform: [{ translateX: slideAnimationDerecha }], alignItems: 'flex-end', }]}
+
+                            >
+                                <View style={[usuarioStyles.neumorphismBoton, usuarioStyles.modalView, { width: width / 2, height: height }]}>
+                                    <Text style={styles.modalText}>Modal DERECHO</Text>
+                                    <MenuPrincipal />
+                                    <Pressable
+                                        style={[styles.button, styles.buttonClose]}
+                                        onPress={() => {
+                                            setModalVisiblDerecho(!modalVisibleDerecho)
+                                            console.log('fuera del modal')
+                                        }}>
+                                        <Text style={styles.textStyle}>Cerrar</Text>
+                                    </Pressable>
+                                </View>
+                            </Animated.View>
+                        </Modal>
+
+
+                        <View style={[usuarioStyles.contenedor]}>
+                        <Text style={globalStyles.textoMy}>My<Text style={globalStyles.textoCompany}>Company</Text></Text>
+                        <Pressable
+                                        style={[styles.Item, styles.buttonClose]}
+                                        onPress={() => {
+                                           
+                                            console.log('boton 1')
+                                        }}>
+                                        <Text style={[styles.textStyle]}>Foto</Text>
+                                    </Pressable>
+                                    <Pressable
+                                        style={[styles.Item, styles.buttonClose]}
+                                        onPress={() => {
+                                           
+                                            console.log('boton 2')
+                                        }}>
+                                        <Text style={styles.textStyle}>Nota Escrita</Text>
+                                    </Pressable>
+                                    <Pressable
+                                        style={[styles.Item, styles.buttonClose]}
+                                        onPress={() => {
+                                           
+                                            console.log('boton 3')
+                                        }}>
+                                        <Text style={styles.textStyle}>Nota Voz</Text>
+                                    </Pressable>
+                                    </View>
+                        
                         {mensaje && mostrarAlerta()}
                     </View>
 
-             
 
-            </PanGestureHandler>
-        </View>
+
+                </PanGestureHandler>
+            </View>
+
+        </ImageBackground>
     );
 }
 
@@ -188,12 +258,12 @@ const styles = StyleSheet.create({
     centeredView: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
+
         marginTop: 22,
     },
     modalView: {
         margin: 20,
-        backgroundColor: 'white',
+        backgroundColor: 'red',
         borderRadius: 20,
         padding: 35,
         alignItems: 'center',
@@ -207,8 +277,9 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     button: {
+        width: '100%',
         borderRadius: 20,
-        padding: 10,
+        padding: 30,
         elevation: 2,
     },
     buttonOpen: {
@@ -225,6 +296,15 @@ const styles = StyleSheet.create({
     modalText: {
         marginBottom: 15,
         textAlign: 'center',
+    },
+    Item: {
+        width: 150, // Ancho de los botones
+        height: 50, // Altura de los botones
+        backgroundColor: '#2196F3', // Color de fondo
+        justifyContent: 'center', // Centrar contenido verticalmente
+        alignItems: 'center', // Centrar contenido horizontalmente
+        borderRadius: 10, // Radio de borde para hacer botones cuadrados
+        marginVertical: 10, // Separación vertical entre botones
     },
 });
 

@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 const globalStyles = StyleSheet.create({
     contenedor: {
         flex: 1,
+        backgroundColor: 'transparent'
     },
     contenido: {
         flexDirection: 'column',
@@ -47,7 +48,29 @@ const globalStyles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 18,
         textTransform: 'uppercase'
-    }
+    },
+    image: {
+
+
+    },
+    textoMy: {
+
+        textAlign: 'center',
+        fontSize: 46,
+        fontWeight: 'bold',
+        marginBottom: 16,
+        color: '#E67E22',
+        fontFamily: 'Rubik', // Fuente
+    },
+    textoCompany: {
+
+        textAlign: 'center',
+        fontSize: 46,
+        fontWeight: 'bold',
+        marginBottom: 16,
+        color: '#2874A6',
+        fontFamily: 'Rubik', // Fuente
+    },
 });
 
 export default globalStyles;
