@@ -1,3 +1,12 @@
+// problemas con poder arrancar el proyecto
+cd android
+./gradlew clean
+./gradlew assembleDebug
+
+
+
+
+
 // Instalar react-navigation/native
 npm install @react-navigation/native
 
@@ -34,3 +43,10 @@ npm install @react-native-async-storage/async-storage
 npm install react-hook-form
 
 npm install react-native-sound // sonidos de alarmas
+
+npm i react-native-vision-camera 
+detro de android/app/src/main/AndroidManifest.xml inside the <manifest> colocar: 
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- optionally, if you want to record audio: -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+

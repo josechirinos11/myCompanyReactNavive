@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
-import { Alert, ImageBackground, Dimensions, View, Text, TextInput, TouchableOpacity, ToastAndroid, Modal, Pressable, StyleSheet, Animated } from 'react-native';
+import { Alert, ImageBackground, Dimensions, View, Text, ActivityIndicator, TextInput, TouchableOpacity, ToastAndroid, Modal, Pressable, StyleSheet, Animated } from 'react-native';
 import globalStyles from '../styles/global';
 import usuarioStyles from '../styles/contenidoUsuarioStyles'
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import MenuPrincipal from './usuario/MenuPrincipal'
 import MenuIzquierdo from './usuario/MenuIzquierdo'
+import { Camera, useCameraDevice, NoCameraDeviceError } from 'react-native-vision-camera'
 
 const image = require('../styles/img/imgFondo.jpg');
 
@@ -26,6 +27,7 @@ const ContenidoUsuario = () => {
     const [email, guardarEmail] = useState('@pata');
     const [password, guardarPassword] = useState('123');
     const [mensaje, guardarMensaje] = useState(null);
+    const [camActiva, setCamActiva] = useState(false)
 
     const [menuVisible, setMenuVisible] = useState(false);
 
@@ -36,6 +38,9 @@ const ContenidoUsuario = () => {
     const slideAnimation = new Animated.Value(-500); // Valor inicial fuera de la pantalla
     const slideAnimationDerecha = new Animated.Value(+500); // Valor inicial fuera de la pantalla
 
+    //camara
+    const device = useCameraDevice('back')
+    const camera = useRef(null)
 
     useEffect(() => {
         if (modalVisible) {
@@ -137,6 +142,23 @@ const ContenidoUsuario = () => {
     });
 
 
+    const openCamera = async () => {
+        console.log('desde la camara')
+        const newCameraPermission = await Camera.requestCameraPermission()
+        const newMicrophonePermission = await Camera.requestMicrophonePermission()
+        console.log(newCameraPermission)
+
+        setCamActiva(true)
+        console.log(camActiva)
+    }
+
+    const tomarFoto = async () => {
+        setCamActiva(false)
+        const photo = await camera.current.takePhoto()
+        console.log(photo)
+      
+    }
+
     return (
 
         <ImageBackground
@@ -214,41 +236,67 @@ const ContenidoUsuario = () => {
 
 
                         <View style={[usuarioStyles.contenedor]}>
-                        <Text style={globalStyles.textoMy}>My<Text style={globalStyles.textoCompany}>Company</Text></Text>
-                        <Pressable
-                                        style={[styles.Item, styles.buttonClose]}
-                                        onPress={() => {
-                                           
-                                            console.log('boton 1')
-                                        }}>
-                                        <Text style={[styles.textStyle]}>Foto</Text>
-                                    </Pressable>
-                                    <Pressable
-                                        style={[styles.Item, styles.buttonClose]}
-                                        onPress={() => {
-                                           
-                                            console.log('boton 2')
-                                        }}>
-                                        <Text style={styles.textStyle}>Nota Escrita</Text>
-                                    </Pressable>
-                                    <Pressable
-                                        style={[styles.Item, styles.buttonClose]}
-                                        onPress={() => {
-                                           
-                                            console.log('boton 3')
-                                        }}>
-                                        <Text style={styles.textStyle}>Nota Voz</Text>
-                                    </Pressable>
-                                    </View>
-                        
+                            <Text style={globalStyles.textoMy}>My<Text style={globalStyles.textoCompany}>Company</Text></Text>
+                            <Pressable
+                                style={[styles.Item, styles.buttonClose]}
+                                onPress={() => {
+                                    openCamera()
+
+
+                                }}>
+                                <Text style={[styles.textStyle]}>Foto</Text>
+                            </Pressable>
+                            <Pressable
+                                style={[styles.Item, styles.buttonClose]}
+                                onPress={() => {
+
+                                    console.log('boton 2')
+                                }}>
+                                <Text style={styles.textStyle}>Nota Escrita</Text>
+                            </Pressable>
+                            <Pressable
+                                style={[styles.Item, styles.buttonClose]}
+                                onPress={() => {
+
+                                    console.log('boton 3')
+                                }}>
+                                <Text style={styles.textStyle}>Nota Voz</Text>
+                            </Pressable>
+                        </View>
+
                         {mensaje && mostrarAlerta()}
                     </View>
-
 
 
                 </PanGestureHandler>
             </View>
 
+            {camActiva && device !== null ? (
+                <View style={StyleSheet.absoluteFill}>
+                    <Camera
+                        ref={camera}
+                        style={StyleSheet.absoluteFill}
+                        device={device}
+                        isActive={true}
+                        photo={true}
+                    />
+                    <TouchableOpacity
+                        style={{
+                            width: 60,
+                            height: 60,
+                            borderRadius: 30,
+                            backgroundColor: 'red',
+                            position: 'absolute',
+                            bottom: 100,
+                            alignSelf: 'center',
+                        }}
+                        onPress={() => {
+                            tomarFoto()
+                        }}
+                    />
+                </View>
+
+            ) : null}
         </ImageBackground>
     );
 }
